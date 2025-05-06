@@ -1,0 +1,215 @@
+---
+title: "Assignment2_5513"
+format: html
+editor: visual
+---
+
+```{r}
+library(knitr)
+```
+
+## Guide book:
+
+#### Step 1:
+
+To start with, in order to create a project we need to make sure that you have R studio installed. Now open it up, on the top right corner you will see "Project: (None)", click on it and choose new project if you have not create one. There are three ways to create:
+
+-   New Directory: Create a new folder with a project inside
+
+-   Existing Directory: Create a new project inside your desire folder
+
+-   Version control: Checkout a project from git
+
+After you done create your project, it should show: ...Rproj, open it and you should see R studio open up. On the top left corner of your R studio, click on that icon will reveal all type of file you will be able to create, choose quarto document to create an qmd file. It will then ask you for the title, author, output file and engine. You should change only the title and author. After that, you should be in the qmd file, now press save button or control + S and then it will ask you to choose a name for your qmd, named it example. You should not touch the default path since it will alway place your new created file in the same folder as your project file. Click save and now you have a new `example.qmd` file. Now you need to click render button to knit the file, the default knited file will alway give html file as an output.
+
+Here is how the example.qmd look like after knit without modifications:
+
+```{r}
+knitr::include_graphics("picture/Knit_file.png")
+```
+
+#### Step 2:
+
+To initialise this folder as a git repository, first you need to go to github and create a new repository lets say guide_book repository without anythings, even not the readme file there. Now you should see something like this:
+
+```{r}
+knitr::include_graphics("picture/repository.png")
+```
+
+So now go to your terminal tab and follow the guide from github to initialise this folder as a git repository and push it to remote. I will help you to push this current folder to the remote.
+
+First create a local repository for your folder
+
+`git init`
+
+Then add all the files you just created include Rproj and qmd files
+
+`git add ...Rproj`
+
+`git add example.qmd`
+
+Commit what you just did for your repository first commit
+
+`git commit -m "First commit"`
+
+Create your main branch for the repository
+
+`git branch -M main`
+
+Add your remote address using your github username. It is recommend to use SSH key
+
+```         
+git@github.com:`your user name`/guide_book.git
+```
+
+For example my user name is Jakey-vn so i add the address like this
+
+`git remote add origin git@github.com:Jakey-vn/guide_book.git`
+
+If it ask for username and password, type it in and dont worry since it will ask for one time only
+
+Then push it onto the remote
+
+`git push -u origin main`
+
+After pushing successful, you should see this line:
+
+```         
+remote: Resolving deltas: 100% (4/4), done.
+To github.com:Jakey-vn/guide_book.git
+ * [new branch]      main -> main
+Branch 'main' set up to track remote branch 'main' from 'origin'.
+```
+
+#### Step 3:
+
+Create new branch named testbranch for the local repository
+
+`git switch -c testbranch`
+
+Now git will create a new branch and get you to that branch. However you need to push it to remote just like how you did for main branch previously for it to appear remotely
+
+`git push -u origin testbranch`
+
+Remember, currently we are on testbranch
+
+Now modify the example.qmd file on your local, add something and save it, also add the file and commit. Then push it to the remote
+
+`git add example.qmd`
+
+`git commit -m "first change"`
+
+`git push origin testbranch`
+
+#### Step 4:
+
+Go back to your local and make sure to check if you are in the project path using `ls`
+
+Create a folder called data inside the folder we are working (for mac user)
+
+`mkdir data`
+
+Then use `ls` again and now you should see data folder inside your project. Also make sure to add csv file from assignment 1 into the data folder
+
+```         
+Assignment2-5513.Rproj  data                    example.qmd
+```
+
+Now add data file, it should also include the csv file
+
+`git add data`
+
+Now, we already commit for adding example.qmd. In order to add both example.qmd file and data file with only one commit, you need to amend the commit
+
+`git commit --amend`
+
+It will open the new vi mode which let you edit the previous commit for everything you did until now include adding data file
+
+```         
+first change
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+```
+
+Leave it as it is, press :wq to save and quit the current vi mode
+
+Now your commit should apply for data also, push it to the remote repository
+
+`git push origin testbranch`
+
+However, since you already push the previous commit which is "first change" onto your remote, you would error as git reject the push for attemp to rewrite commit history on git.
+
+```         
+ ! [rejected]        testbranch -> testbranch (non-fast-forward)
+error: failed to push some refs to 'github.com:Jakey-vn/guide_book.git'
+```
+
+However, you could force it to push to overwrite the commit history on remote
+
+`git push -f origin testbranch`
+
+But this is not recommend if you do it on your main or on public. It is recommend to do it in a sub branch to avoid problems
+
+After you push then your testbranch should contain both data and modify from example.qmd with only two commits in total
+
+#### Step 5:
+
+Now in order to create a conflict by merge testbranch with main, you need to switch to main
+
+`git switch main`
+
+Then modify the example.qmd, add only example.qmd, commit and push it to remote
+
+`git add example.qmd`
+
+`git commit -m "first change"`
+
+#### Step 6:
+
+Now try to merge testbranch into main (make sure you are in main branch)
+
+`git merge testbranch`
+
+`git push origin main`
+
+Now you would get error for doing so as main now are also on the second commit like testbranch but with different contents
+
+```         
+Trans-MacBook-Pro:Assignment2-5513 jakey782003$ git push origin main
+To github.com:Jakey-vn/guide_book.git
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'github.com:Jakey-vn/guide_book.git'
+```
+
+To continue, you need to pull the data from remote, it will auto merge but still ask you to fix the conflict
+
+`git pull`
+
+Now you can go to the example.qmd file see something like
+
+```         
+<<<<<<< HEAD
+# change by Huy
+=======
+# this is first change
+>>>>>>> f15c4706abd1ca5420d9dd475c486673d915e7dd
+```
+
+You need to remove everything while leaving only what content you want for example.qmd like this
+
+```         
+# this is first change
+```
+
+Then add the new fixed file as normal, commit it and push it
+
+`git add example.qmd`
+
+`git commit -m "fix conflict"`
+
+`git push origin main`
+
+It should be successful now and leave you with 4 commits, one initial commit, one commit from your testbranch, one from your main and one after fix the conflict
+
+#### Step 7:
